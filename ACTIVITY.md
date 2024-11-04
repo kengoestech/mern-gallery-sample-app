@@ -1,6 +1,6 @@
 ### Create an AWS Infrastructure for this app
 
-![mern_aws.drawio.png](./mern_aws.drawio.png)
+![mern_aws.drawio.png](https://github.com/jbetueldev/mern-gallery-sample-app/blob/main/mern-aws-diagram.png?raw=true)
 
 ## Prerequisites:
 - An AWS account
