@@ -137,7 +137,7 @@ docker buildx build -t mern-frontend:latest .
 docker run -p 3000:3000 -d mern-frontend:latest
 ```
 
-## Running the whole stock using Docker
+## Running the whole stack using Docker
 
 ```
 docker compose -f compose.yml up -d --build
