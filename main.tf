@@ -48,7 +48,7 @@ resource "aws_subnet" "private_subnet_fp" {
 resource "aws_security_group" "nginx_proxy_sg" {
   name = "nginx_proxy_sg"
   description = "Allow HTTP traffic"
-  vpc_id = aws.vpc_fp.id
+  vpc_id = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow HTTP from anywhere"
     from_port = 80
@@ -69,7 +69,7 @@ resource "aws_security_group" "nginx_proxy_sg" {
 resource "aws_security_group" "frontend_sg" {
   name = "frontend_sg"
   description = "Allow HTTP traffic"
-  vpc_id = aws.vpc_fp.id
+  vpc_id = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow HTTP from anywhere"
     from_port = 80
@@ -90,7 +90,7 @@ resource "aws_security_group" "frontend_sg" {
 resource "aws_security_group" "backend_sg" {
   name = "backend_sg"
   description = "Allow app traffic to backend"
-  vpc_id = aws.vpc_fp.id
+  vpc_id = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow app traffic from NLB to backend on port 5000"
     from_port = 5000
@@ -111,7 +111,7 @@ resource "aws_security_group" "backend_sg" {
 resource "aws_security_group" "mongodb_sg" {
   name = "mongodb_sg"
   description = "Allow app traffic to access the server"
-  vpc_id = aws.vpc_fp.id
+  vpc_id = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow app traffic to access the server on port 27017"
     from_port = 27017
@@ -121,18 +121,21 @@ resource "aws_security_group" "mongodb_sg" {
   }
 }
 
-# # Create ec2 load balancer nginx
-# resource "aws_instance" "nginx_proxy" {
-#   ami = "ami-020cba7c55df1f615"
-#   instance_type = "t2.micro"
-#   key_name = var.key_pair
-#   subnet_id = aws_subnet.public_subnet_fp.id
-#   associate_public_ip_address = true
-#   vpc_security_group_ids = [aws_security_group.nginx_proxy_sg]
-#   tags = {
-#     Name = "nginx_proxy"
-#   }
-# }
+# Create ec2 load balancer nginx
+resource "aws_instance" "nginx_proxy" {
+  ami = "ami-020cba7c55df1f615"
+  instance_type = "t2.micro"
+  key_name = var.key_pair
+  subnet_id = aws_subnet.public_subnet_fp.id
+  associate_public_ip_address = true
+  vpc_security_group_ids = [aws_security_group.nginx_proxy_sg]
+  user_data = templatefile("nginx-setup.sh.tpl", {
+    private_nlb_dns = aws_lb.private_nlb.dns_name
+  })
+  tags = {
+    Name = "nginx_proxy"
+  }
+}
 
 # Create ec2 frontend-instance-1
 resource "aws_instance" "frontend-instance-1" {
@@ -196,17 +199,56 @@ resource "aws_instance" "backend-instance-3" {
   }
 }
 
-# # Create private NLB
-# resource "aws_instance" "backend-instance-3" {
-#   ami = "ami-020cba7c55df1f615"
-#   instance_type = "t2.micro"
-#   key_name = var.key_pair
-#   subnet_id = aws_subnet.private_subnet_fp.id
-#   vpc_security_group_ids = [aws_security_group.backend_sg.id]
-#   tags = {
-#     Name = "backend-instance-3"
-#   }
-# }
+# Create private NLB
+resource "aws_lb" "private_lb_fp" {
+  name = "private_lb_fp"
+  internal = true
+  load_balancer_type = "network"
+  subnets = [aws_subnet.private_subnet_fp.id]
+  tags = {
+    Name = "private_lb_fp"
+  }
+}
+
+# Defines Backend targets
+resource "aws_lb_target_group" "backend_tg" {
+  name     = "backend-tg"
+  port     = 5000
+  protocol = "TCP"
+  vpc_id   = aws_vpc.vpc_fp.id
+}
+
+# Port Forward to backend tg
+resource "aws_lb_listener" "private_nlb_listener" {
+  load_balancer_arn = aws_lb.private_lb_fp.arn
+  port              = 5000
+  protocol          = "TCP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend_tg.arn
+  }
+}
+
+# Attach backend EC2 instance 1
+resource "aws_lb_target_group_attachment" "backend_attachment_1" {
+  target_group_arn = aws_lb_target_group.backend_tg.arn
+  target_id        = aws_instance.backend-instance-1.id
+  port             = 5000
+}
+
+# Attach backend EC2 instance 2
+resource "aws_lb_target_group_attachment" "backend_attachment_2" {
+  target_group_arn = aws_lb_target_group.backend_tg.arn
+  target_id        = aws_instance.backend-instance-2.id
+  port             = 5000
+}
+
+# Attach backend EC2 instance 3
+resource "aws_lb_target_group_attachment" "backend_attachment_3" {
+  target_group_arn = aws_lb_target_group.backend_tg.arn
+  target_id        = aws_instance.backend-instance-3.id
+  port             = 5000
+}
 
 # Create ec2 mongodb server
 resource "aws_instance" "mongodb_server" {
