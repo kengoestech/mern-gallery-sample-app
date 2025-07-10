@@ -114,7 +114,7 @@ resource "aws_security_group" "nginx_proxy_sg" {
   name        = "nginx-proxy-sg"
   description = "Allow HTTP traffic"
   vpc_id      = aws_vpc.vpc_fp.id
-    ingress {
+  ingress {
     description = "Allow SSH"
     from_port   = 22
     to_port     = 22
@@ -137,17 +137,17 @@ resource "aws_security_group" "nginx_proxy_sg" {
   }
 }
 
-# Create security group for frontend 
+# Create security group for frontend - allow SSH from nginx only
 resource "aws_security_group" "frontend_sg" {
   name        = "frontend-sg"
   description = "Allow HTTP traffic"
   vpc_id      = aws_vpc.vpc_fp.id
   ingress {
-    description = "Allow SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Allow SSH"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
   }
   ingress {
     description = "Allow HTTP from anywhere"
@@ -170,12 +170,12 @@ resource "aws_security_group" "backend_sg" {
   name        = "backend-sg"
   description = "Allow app traffic to backend"
   vpc_id      = aws_vpc.vpc_fp.id
-    ingress {
-    description = "Allow SSH from Nginx proxy"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"] # public bastion nginx proxy
+  ingress {
+    description     = "Allow SSH"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
   }
   ingress {
     description = "Allow app traffic from frontend to backend on port 5000"
@@ -204,6 +204,13 @@ resource "aws_security_group" "mongodb_sg" {
     to_port     = 27017
     protocol    = "tcp"
     cidr_blocks = ["10.0.2.0/24"] # Private subnet cidr_block
+  }
+  ingress {
+    description     = "Allow SSH"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
   }
 }
 
@@ -234,7 +241,7 @@ resource "aws_security_group" "mongodb_sg" {
 
 #   }
 #   }
- 
+
 
 # Create ec2 load balancer nginx
 resource "aws_instance" "nginx_proxy" {
