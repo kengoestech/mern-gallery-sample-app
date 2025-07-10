@@ -1,11 +1,11 @@
 #!/bin/bash
-sudo apt update -y
-sudo apt install -y nginx
+apt update -y
+apt install -y nginx
 
 cat > /etc/nginx/sites-available/default <<EOF
 upstream frontend {
-    server ${frontend1_private_ip}; 
-    server ${frontend2_private_ip}; 
+    server ${frontend1_private_ip}:80;
+    server ${frontend2_private_ip}:80;
 }
 
 server {
