@@ -114,6 +114,13 @@ resource "aws_security_group" "nginx_proxy_sg" {
   name        = "nginx-proxy-sg"
   description = "Allow HTTP traffic"
   vpc_id      = aws_vpc.vpc_fp.id
+    ingress {
+    description = "Allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   ingress {
     description = "Allow HTTP from anywhere"
     from_port   = 80
@@ -136,6 +143,13 @@ resource "aws_security_group" "frontend_sg" {
   description = "Allow HTTP traffic"
   vpc_id      = aws_vpc.vpc_fp.id
   ingress {
+    description = "Allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
     description = "Allow HTTP from anywhere"
     from_port   = 80
     to_port     = 80
@@ -156,6 +170,13 @@ resource "aws_security_group" "backend_sg" {
   name        = "backend-sg"
   description = "Allow app traffic to backend"
   vpc_id      = aws_vpc.vpc_fp.id
+    ingress {
+    description = "Allow SSH from Nginx proxy"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.1.0/24"] # public bastion nginx proxy
+  }
   ingress {
     description = "Allow app traffic from frontend to backend on port 5000"
     from_port   = 5000
