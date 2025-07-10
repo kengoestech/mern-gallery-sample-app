@@ -12,7 +12,7 @@ provider "aws" {
   region = "us-east-1"
   # access_key = ""
   # secret_key = ""
-  
+
 }
 
 # Create a VPC
@@ -35,7 +35,7 @@ resource "aws_internet_gateway" "gateway" {
 # Configure NAT gateway
 resource "aws_nat_gateway" "nat_gateway_fp" {
   allocation_id = aws_eip.eip_fp.id
-  subnet_id = aws_subnet.public_subnet_fp.id
+  subnet_id     = aws_subnet.public_subnet_fp.id
 
   tags = {
     Name = "nat-gateway"
@@ -68,7 +68,7 @@ resource "aws_route_table" "route_table_private" {
   vpc_id = aws_vpc.vpc_fp.id
 
   route {
-    cidr_block = "0.0.0.0/0" # Internet traffic
+    cidr_block     = "0.0.0.0/0" # Internet traffic
     nat_gateway_id = aws_nat_gateway.nat_gateway_fp.id
   }
   tags = {
@@ -84,15 +84,15 @@ resource "aws_route_table_association" "public_rta" {
 
 # Route Table association for private subnet
 resource "aws_route_table_association" "private_rta" {
-  subnet_id = aws_subnet.private_subnet_fp.id
+  subnet_id      = aws_subnet.private_subnet_fp.id
   route_table_id = aws_route_table.route_table_private.id
 }
 
 # Create public subnet
 resource "aws_subnet" "public_subnet_fp" {
-  vpc_id = aws_vpc.vpc_fp.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.vpc_fp.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
   tags = {
     Name = "public-subnet-fp"
@@ -101,8 +101,8 @@ resource "aws_subnet" "public_subnet_fp" {
 
 # Create private subnet
 resource "aws_subnet" "private_subnet_fp" {
-  vpc_id = aws_vpc.vpc_fp.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.vpc_fp.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1a"
   tags = {
     Name = "private-subnet-fp"
@@ -111,89 +111,89 @@ resource "aws_subnet" "private_subnet_fp" {
 
 # Create security group for nginx proxy
 resource "aws_security_group" "nginx_proxy_sg" {
-  name = "nginx-proxy-sg"
+  name        = "nginx-proxy-sg"
   description = "Allow HTTP traffic"
-  vpc_id = aws_vpc.vpc_fp.id
+  vpc_id      = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow HTTP from anywhere"
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     description = "Allow all traffic"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 # Create security group for frontend 
 resource "aws_security_group" "frontend_sg" {
-  name = "frontend-sg"
+  name        = "frontend-sg"
   description = "Allow HTTP traffic"
-  vpc_id = aws_vpc.vpc_fp.id
+  vpc_id      = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow HTTP from anywhere"
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     description = "Allow all traffic"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 # Create security group for backend 
 resource "aws_security_group" "backend_sg" {
-  name = "backend-sg"
+  name        = "backend-sg"
   description = "Allow app traffic to backend"
-  vpc_id = aws_vpc.vpc_fp.id
+  vpc_id      = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow app traffic from frontend to backend on port 5000"
-    from_port = 5000
-    to_port = 5000
-    protocol = "tcp"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
     cidr_blocks = ["10.0.1.0/24"] # frontend subnet cidr_block
   }
   egress {
     description = "default"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 # Create security group for mongodb server
 resource "aws_security_group" "mongodb_sg" {
-  name = "mongodb-sg"
+  name        = "mongodb-sg"
   description = "Allow app traffic to access the server"
-  vpc_id = aws_vpc.vpc_fp.id
+  vpc_id      = aws_vpc.vpc_fp.id
   ingress {
     description = "Allow app traffic to access the server on port 27017"
-    from_port = 27017
-    to_port = 27017
-    protocol = "tcp"
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
     cidr_blocks = ["10.0.2.0/24"] # Private subnet cidr_block
   }
 }
 
 # Create ec2 load balancer nginx
 resource "aws_instance" "nginx_proxy" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.public_subnet_fp.id
+  ami                         = "ami-020cba7c55df1f615"
+  instance_type               = "t2.micro"
+  key_name                    = var.key_pair
+  subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids = [aws_security_group.nginx_proxy_sg.id]
+  vpc_security_group_ids      = [aws_security_group.nginx_proxy_sg.id]
   user_data = templatefile("nginx-setup.sh.tpl", {
     frontend1_private_ip = aws_instance.frontend_instance_1.private_ip,
     frontend2_private_ip = aws_instance.frontend_instance_2.private_ip
@@ -205,12 +205,12 @@ resource "aws_instance" "nginx_proxy" {
 
 # Create ec2 frontend-instance-1
 resource "aws_instance" "frontend_instance_1" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.public_subnet_fp.id
+  ami                         = "ami-020cba7c55df1f615"
+  instance_type               = "t2.micro"
+  key_name                    = var.key_pair
+  subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids = [aws_security_group.frontend_sg.id]
+  vpc_security_group_ids      = [aws_security_group.frontend_sg.id]
   tags = {
     Name = "frontend-instance-1"
   }
@@ -218,12 +218,12 @@ resource "aws_instance" "frontend_instance_1" {
 
 # Create ec2 frontend-instance-2
 resource "aws_instance" "frontend_instance_2" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.public_subnet_fp.id
+  ami                         = "ami-020cba7c55df1f615"
+  instance_type               = "t2.micro"
+  key_name                    = var.key_pair
+  subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids = [aws_security_group.frontend_sg.id]
+  vpc_security_group_ids      = [aws_security_group.frontend_sg.id]
   tags = {
     Name = "frontend-instance-2"
   }
@@ -231,10 +231,10 @@ resource "aws_instance" "frontend_instance_2" {
 
 # Create ec2 backend-instance-1
 resource "aws_instance" "backend_instance_1" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.private_subnet_fp.id
+  ami                    = "ami-020cba7c55df1f615"
+  instance_type          = "t2.micro"
+  key_name               = var.key_pair
+  subnet_id              = aws_subnet.private_subnet_fp.id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   tags = {
     Name = "backend-instance-1"
@@ -243,10 +243,10 @@ resource "aws_instance" "backend_instance_1" {
 
 # Create ec2 backend-instance-2
 resource "aws_instance" "backend_instance_2" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.private_subnet_fp.id
+  ami                    = "ami-020cba7c55df1f615"
+  instance_type          = "t2.micro"
+  key_name               = var.key_pair
+  subnet_id              = aws_subnet.private_subnet_fp.id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   tags = {
     Name = "backend-instance-2"
@@ -255,10 +255,10 @@ resource "aws_instance" "backend_instance_2" {
 
 # Create ec2 backend-instance-3
 resource "aws_instance" "backend_instance_3" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.private_subnet_fp.id
+  ami                    = "ami-020cba7c55df1f615"
+  instance_type          = "t2.micro"
+  key_name               = var.key_pair
+  subnet_id              = aws_subnet.private_subnet_fp.id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   tags = {
     Name = "backend-instance-3"
@@ -267,10 +267,10 @@ resource "aws_instance" "backend_instance_3" {
 
 # Create private NLB
 resource "aws_lb" "private_lb_fp" {
-  name = "private-lb-fp"
-  internal = true
+  name               = "private-lb-fp"
+  internal           = true
   load_balancer_type = "network"
-  subnets = [aws_subnet.private_subnet_fp.id]
+  subnets            = [aws_subnet.private_subnet_fp.id]
   tags = {
     Name = "private-lb-fp"
   }
@@ -318,10 +318,10 @@ resource "aws_lb_target_group_attachment" "backend_attachment_3" {
 
 # Create ec2 mongodb server
 resource "aws_instance" "mongodb_server" {
-  ami = "ami-020cba7c55df1f615"
-  instance_type = "t2.micro"
-  key_name = var.key_pair
-  subnet_id = aws_subnet.private_subnet_fp.id
+  ami                    = "ami-020cba7c55df1f615"
+  instance_type          = "t2.micro"
+  key_name               = var.key_pair
+  subnet_id              = aws_subnet.private_subnet_fp.id
   vpc_security_group_ids = [aws_security_group.mongodb_sg.id]
   tags = {
     Name = "mongodb-server"
@@ -330,9 +330,9 @@ resource "aws_instance" "mongodb_server" {
 
 # Create s3 bucket
 resource "aws_s3_bucket" "s3_bucket_fp" {
-  bucket = "s3-bucket-fp-2025" 
+  bucket = "s3-bucket-fp-2025"
   tags = {
-    Name = "s3-bucket-fp"
+    Name        = "s3-bucket-fp"
     Environment = "Dev"
   }
 }
