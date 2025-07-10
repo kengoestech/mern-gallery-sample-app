@@ -207,6 +207,35 @@ resource "aws_security_group" "mongodb_sg" {
   }
 }
 
+# # Create security group for jenkins 
+# resource "aws_security_group" "jenkins_sg_fp" {
+#   name        = "jenkins-sg-fp"
+#   description = "Allow app traffic to deploy to app to instances"
+#   vpc_id      = aws_vpc.vpc_fp.id
+#   # ingress {
+#   #   description = "Allow app traffic to access the server on port 27017"
+#   #   from_port   = 27017
+#   #   to_port     = 27017
+#   #   protocol    = "tcp"
+#   #   cidr_blocks = ["10.0.2.0/24"] # Private subnet cidr_block
+#   }
+
+# # Create ec2 for deployment using Jenkins
+# resource "aws_instance" "jenkins_fp" {
+#   ami                         = "ami-020cba7c55df1f615"
+#   instance_type = "t2.micro"
+#   key_name = var.key_pair
+#   subnet_id                   = aws_subnet.public_subnet_fp.id
+#   associate_public_ip_address = true
+#   # vpc_security_group_ids = 
+#   # user_data = {
+#    tags = {
+#     Name = "Jenkins-fp"
+
+#   }
+#   }
+ 
+
 # Create ec2 load balancer nginx
 resource "aws_instance" "nginx_proxy" {
   ami                         = "ami-020cba7c55df1f615"
