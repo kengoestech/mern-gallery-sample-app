@@ -23,6 +23,71 @@ resource "aws_vpc" "vpc_fp" {
   }
 }
 
+# Configure Internet Gateway
+resource "aws_internet_gateway" "gateway" {
+  vpc_id = aws_vpc.vpc_fp.id
+
+  tags = {
+    Name = "gateway-fp"
+  }
+}
+
+# Configure NAT gateway
+resource "aws_nat_gateway" "nat_gateway_fp" {
+  allocation_id = aws_eip.eip_fp.id
+  subnet_id = aws_subnet.public_subnet_fp.id
+
+  tags = {
+    Name = "nat-gateway"
+  }
+}
+
+# Configure Elastic IP required for NAT Gateway
+resource "aws_eip" "eip_fp" {
+  domain = "vpc"
+  tags = {
+    Name = "nat-eip"
+  }
+}
+
+# Route Table for public subnet
+resource "aws_route_table" "route_table_public" {
+  vpc_id = aws_vpc.vpc_fp.id
+
+  route {
+    cidr_block = "0.0.0.0/0" # All outbound internet traffic
+    gateway_id = aws_internet_gateway.gateway.id
+  }
+  tags = {
+    Name = "Route-table-public"
+  }
+}
+
+# Route Table for private subnet
+resource "aws_route_table" "route_table_private" {
+  vpc_id = aws_vpc.vpc_fp.id
+
+  route {
+    cidr_block = "0.0.0.0/0" # Internet traffic
+    nat_gateway_id = aws_nat_gateway.nat_gateway_fp.id
+  }
+  tags = {
+    Name = "Route-table-private"
+  }
+}
+
+# Route Table association for public subnet
+resource "aws_route_table_association" "public_rta" {
+  subnet_id      = aws_subnet.public_subnet_fp.id
+  route_table_id = aws_route_table.route_table_public.id
+}
+
+# Route Table association for private subnet
+resource "aws_route_table_association" "private_rta" {
+  subnet_id = aws_subnet.private_subnet_fp.id
+  route_table_id = aws_route_table.route_table_private.id
+}
+
 # Create public subnet
 resource "aws_subnet" "public_subnet_fp" {
   vpc_id = aws_vpc.vpc_fp.id
@@ -233,21 +298,21 @@ resource "aws_lb_listener" "private_nlb_listener" {
 # Attach backend EC2 instance 1
 resource "aws_lb_target_group_attachment" "backend_attachment_1" {
   target_group_arn = aws_lb_target_group.backend_tg.arn
-  target_id        = aws_instance.backend-instance-1.id
+  target_id        = aws_instance.backend_instance_1.id
   port             = 5000
 }
 
 # Attach backend EC2 instance 2
 resource "aws_lb_target_group_attachment" "backend_attachment_2" {
   target_group_arn = aws_lb_target_group.backend_tg.arn
-  target_id        = aws_instance.backend-instance-2.id
+  target_id        = aws_instance.backend_instance_2.id
   port             = 5000
 }
 
 # Attach backend EC2 instance 3
 resource "aws_lb_target_group_attachment" "backend_attachment_3" {
   target_group_arn = aws_lb_target_group.backend_tg.arn
-  target_id        = aws_instance.backend-instance-3.id
+  target_id        = aws_instance.backend_instance_3.id
   port             = 5000
 }
 
