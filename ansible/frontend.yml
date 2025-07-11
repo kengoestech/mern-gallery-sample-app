@@ -1,0 +1,33 @@
+- name: Setup frontend
+  hosts: frontend
+  become: true
+
+  tasks:
+
+    - name: Clone from git repository
+      ansible.builtin.git:
+        repo: 'https://github.com/kengoestech/mern-gallery-sample-app.git'
+        clone: true
+        version: main
+        dest: /home/ubuntu/
+
+    - name: Install Docker inside backend instance
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Build Docker Image
+      community.docker.docker_image:
+        name: backend-app
+        tag: latest
+        build:
+          path: /home/ubuntu/frontend
+
+    - name: Run Container Image
+      community.docker.docker_container:
+        name: backend-app
+        image: backend-app:latest
+        state: started
+        exposed_ports:
+          - "3000:3000"
