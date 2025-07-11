@@ -151,8 +151,8 @@ resource "aws_security_group" "frontend_sg" {
   }
   ingress {
     description = "Allow HTTP from anywhere"
-    from_port   = 80
-    to_port     = 80
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -191,6 +191,13 @@ resource "aws_security_group" "backend_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+    egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 # Create security group for mongodb server
@@ -198,21 +205,32 @@ resource "aws_security_group" "mongodb_sg" {
   name        = "mongodb-sg"
   description = "Allow app traffic to access the server"
   vpc_id      = aws_vpc.vpc_fp.id
+
   ingress {
     description = "Allow app traffic to access the server on port 27017"
     from_port   = 27017
     to_port     = 27017
     protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"] # Private subnet cidr_block
+    cidr_blocks = ["10.0.2.0/24"]
   }
+
   ingress {
     description     = "Allow SSH"
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
+    security_groups = [aws_security_group.nginx_proxy_sg.id]
+  }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 
 # # Create security group for jenkins 
 # resource "aws_security_group" "jenkins_sg_fp" {
@@ -375,7 +393,7 @@ resource "aws_lb_target_group_attachment" "backend_attachment_3" {
 
 # Create ec2 mongodb server
 resource "aws_instance" "mongodb_server" {
-  ami                    = "ami-020cba7c55df1f615"
+  ami                    = "ami-0fc5d935ebf8bc3bc"
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
@@ -392,6 +410,15 @@ resource "aws_s3_bucket" "s3_bucket_fp" {
     Name        = "s3-bucket-fp"
     Environment = "Dev"
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "public_block" {
+  bucket = aws_s3_bucket.s3_bucket_fp.bucket
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 resource "aws_s3_bucket_policy" "public_read_policy" {
@@ -411,12 +438,5 @@ resource "aws_s3_bucket_policy" "public_read_policy" {
   })
 }
 
-resource "aws_s3_bucket_public_access_block" "allow_public" {
-  bucket = aws_s3_bucket.s3_bucket_fp.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
 
