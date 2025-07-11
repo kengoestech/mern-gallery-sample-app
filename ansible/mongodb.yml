@@ -1,30 +1,29 @@
 - name: Setup MongoDB
   hosts: mongodb
-  become: true
-
+  become: yes
   tasks:
     - name: Add MongoDB GPG key
-      apt_key:
-        url: https://www.mongodb.org/static/pgp/server-4.4.asc
+      ansible.builtin.apt_key:
+        url: https://www.mongodb.org/static/pgp/server-6.0.asc
         state: present
 
-    - name: Add MongoDB repo
-      apt_repository:
-        repo: "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse"
+    - name: Add MongoDB 6.0 repository
+      ansible.builtin.apt_repository:
+        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse"
         state: present
-        filename: mongodb-org
+        filename: "mongodb-org-6.0"
 
     - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
 
     - name: Install MongoDB
-      apt:
+      ansible.builtin.apt:
         name: mongodb-org
         state: present
 
-    - name: Start and enable MongoDB
-      systemd:
+    - name: Enable and start MongoDB
+      ansible.builtin.systemd:
         name: mongod
-        state: started
         enabled: yes
+        state: started

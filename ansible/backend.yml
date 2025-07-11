@@ -7,9 +7,8 @@
     - name: Clone from git repository
       ansible.builtin.git:
         repo: 'https://github.com/kengoestech/mern-gallery-sample-app.git'
-        clone: true
         version: main
-        dest: /home/ubuntu/
+        dest: /home/ubuntu/app
 
     - name: Install Docker inside backend instance
       ansible.builtin.apt:
@@ -17,21 +16,27 @@
         state: present
         update_cache: true
 
+    # - name: Wait for MongoDB to be available
+    #   ansible.builtin.wait_for:
+    #     host: 10.0.2.40
+    #     port: 27017
+    #     timeout: 30
+
     - name: Build Docker Image
       community.docker.docker_image:
         name: backend-app
         tag: latest
+        source: build
         build:
-          path: /home/ubuntu/backend
+          path: /home/ubuntu/app/backend
 
     - name: Run Container Image
       community.docker.docker_container:
         name: backend-app
         image: backend-app:latest
         state: started
-        exposed_ports:
+        restart_policy: always
+        published_ports:
           - "5000:5000"
-
-
-
-
+        env:
+          MONGODB_URI: "mongodb://10.0.2.177:27017/todos"

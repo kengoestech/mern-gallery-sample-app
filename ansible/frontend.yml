@@ -9,9 +9,9 @@
         repo: 'https://github.com/kengoestech/mern-gallery-sample-app.git'
         clone: true
         version: main
-        dest: /home/ubuntu/
+        dest: /home/ubuntu/app
 
-    - name: Install Docker inside backend instance
+    - name: Install Docker inside frontend instance
       ansible.builtin.apt:
         name: docker.io
         state: present
@@ -19,15 +19,16 @@
 
     - name: Build Docker Image
       community.docker.docker_image:
-        name: backend-app
+        name: frontend-app
         tag: latest
+        source: build
         build:
-          path: /home/ubuntu/frontend
+          path: /home/ubuntu/app/frontend
 
     - name: Run Container Image
       community.docker.docker_container:
-        name: backend-app
-        image: backend-app:latest
+        name: frontend-app
+        image: frontend-app:latest
         state: started
-        exposed_ports:
+        published_ports:
           - "3000:3000"
