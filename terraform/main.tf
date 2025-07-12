@@ -412,13 +412,15 @@ resource "aws_s3_bucket" "s3_bucket_fp" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "public_block" {
-  bucket = aws_s3_bucket.s3_bucket_fp.bucket
+resource "aws_s3_bucket_public_access_block" "block" {
+  bucket = aws_s3_bucket.s3_bucket_fp.id
 
   block_public_acls       = false
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
+
+  depends_on = [aws_s3_bucket.s3_bucket_fp]
 }
 
 resource "aws_s3_bucket_policy" "public_read_policy" {
