@@ -340,7 +340,7 @@ resource "aws_instance" "frontend_instance_2" {
   key_name                    = var.key_pair
   subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.fp_sg]
+  vpc_security_group_ids      = [aws_security_group.fp_sg.id]
   tags = {
     Name = "frontend-instance-2"
   }
@@ -364,7 +364,7 @@ resource "aws_instance" "backend_instance_2" {
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
-  vpc_security_group_ids = [aws_security_group.fp_sg]
+  vpc_security_group_ids = [aws_security_group.fp_sg.id]
   tags = {
     Name = "backend-instance-2"
   }
@@ -376,7 +376,7 @@ resource "aws_instance" "backend_instance_3" {
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
-  vpc_security_group_ids = [aws_security_group.fp_sg]
+  vpc_security_group_ids = [aws_security_group.fp_sg.id]
   tags = {
     Name = "backend-instance-3"
   }
