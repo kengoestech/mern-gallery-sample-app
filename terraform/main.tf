@@ -135,7 +135,7 @@ resource "aws_security_group" "fp_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-    ingress {
+  ingress {
     description = "Connect frontend to backend"
     from_port   = 5000
     to_port     = 5000
