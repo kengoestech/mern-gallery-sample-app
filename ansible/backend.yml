@@ -3,12 +3,16 @@
   become: true
 
   tasks:
-    - name: Clone backend source code from GitHub
-      ansible.builtin.git:
+    - name: Remove existing backend directory (if any)
+      file:
+        path: /home/ubuntu/app/ansible/backend
+        state: absent
+
+    - name: Clone backend repo
+      git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
         dest: /home/ubuntu/app/ansible/backend
         version: main
-        force: yes
 
     - name: Install required system packages
       apt:

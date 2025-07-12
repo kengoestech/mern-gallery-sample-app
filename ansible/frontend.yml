@@ -3,12 +3,16 @@
   become: true
 
   tasks:
-    - name: Clone frontend source code from GitHub
-      ansible.builtin.git:
+    - name: Remove existing frontend directory (if any)
+      file:
+        path: /home/ubuntu/app/ansible/frontend
+        state: absent
+
+    - name: Clone backend repo
+      git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
         dest: /home/ubuntu/app/ansible/frontend
         version: main
-        force: yes
 
     - name: Install required system packages
       apt:
