@@ -310,7 +310,7 @@ resource "aws_instance" "nginx_proxy" {
   key_name                    = var.key_pair
   subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.nginx_proxy_sg.id]
+  vpc_security_group_ids      = [aws_security_group.fp_sg.id]
   user_data = templatefile("nginx-setup.sh.tpl", {
     frontend1_private_ip = aws_instance.frontend_instance_1.private_ip,
     frontend2_private_ip = aws_instance.frontend_instance_2.private_ip
@@ -327,7 +327,7 @@ resource "aws_instance" "frontend_instance_1" {
   key_name                    = var.key_pair
   subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.frontend_sg.id]
+  vpc_security_group_ids      = [aws_security_group.fp_sg.id]
   tags = {
     Name = "frontend-instance-1"
   }
@@ -340,7 +340,7 @@ resource "aws_instance" "frontend_instance_2" {
   key_name                    = var.key_pair
   subnet_id                   = aws_subnet.public_subnet_fp.id
   associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.frontend_sg.id]
+  vpc_security_group_ids      = [aws_security_group.fp_sg]
   tags = {
     Name = "frontend-instance-2"
   }
@@ -352,7 +352,7 @@ resource "aws_instance" "backend_instance_1" {
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
-  vpc_security_group_ids = [aws_security_group.backend_sg.id]
+  vpc_security_group_ids = [aws_security_group.fp_sg.id]
   tags = {
     Name = "backend-instance-1"
   }
@@ -364,7 +364,7 @@ resource "aws_instance" "backend_instance_2" {
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
-  vpc_security_group_ids = [aws_security_group.backend_sg.id]
+  vpc_security_group_ids = [aws_security_group.fp_sg]
   tags = {
     Name = "backend-instance-2"
   }
@@ -376,7 +376,7 @@ resource "aws_instance" "backend_instance_3" {
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
-  vpc_security_group_ids = [aws_security_group.backend_sg.id]
+  vpc_security_group_ids = [aws_security_group.fp_sg]
   tags = {
     Name = "backend-instance-3"
   }
@@ -393,42 +393,42 @@ resource "aws_lb" "private_lb_fp" {
   }
 }
 
-# Defines Backend targets
-resource "aws_lb_target_group" "backend_tg" {
-  name     = "backend-tg"
-  port     = 5000
-  protocol = "TCP"
-  vpc_id   = aws_vpc.vpc_fp.id
-}
-
-# Port Forward to backend tg
+# Port Forward to backend: forward requests to target group
 resource "aws_lb_listener" "private_nlb_listener" {
   load_balancer_arn = aws_lb.private_lb_fp.arn
   port              = 5000
   protocol          = "TCP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.backend_tg.arn
+    target_group_arn = aws_lb_target_group.nlb_targets.arn
   }
 }
 
-# Attach backend EC2 instance 1
+# Creates NLB target group
+resource "aws_lb_target_group" "nlb_targets" {
+  name     = "nlb-tg"
+  port     = 5000
+  protocol = "TCP"
+  vpc_id   = aws_vpc.vpc_fp.id
+}
+
+# Attach backend EC2 instance 1 to target group
 resource "aws_lb_target_group_attachment" "backend_attachment_1" {
-  target_group_arn = aws_lb_target_group.backend_tg.arn
+  target_group_arn = aws_lb_target_group.nlb_targets.arn
   target_id        = aws_instance.backend_instance_1.id
   port             = 5000
 }
 
-# Attach backend EC2 instance 2
+# Attach backend EC2 instance 2 to target group
 resource "aws_lb_target_group_attachment" "backend_attachment_2" {
-  target_group_arn = aws_lb_target_group.backend_tg.arn
+  target_group_arn = aws_lb_target_group.nlb_targets.arn
   target_id        = aws_instance.backend_instance_2.id
   port             = 5000
 }
 
-# Attach backend EC2 instance 3
+# Attach backend EC2 instance 3 to target group
 resource "aws_lb_target_group_attachment" "backend_attachment_3" {
-  target_group_arn = aws_lb_target_group.backend_tg.arn
+  target_group_arn = aws_lb_target_group.nlb_targets.arn
   target_id        = aws_instance.backend_instance_3.id
   port             = 5000
 }
@@ -439,7 +439,7 @@ resource "aws_instance" "mongodb_server" {
   instance_type          = "t2.micro"
   key_name               = var.key_pair
   subnet_id              = aws_subnet.private_subnet_fp.id
-  vpc_security_group_ids = [aws_security_group.mongodb_sg.id]
+  vpc_security_group_ids = [aws_security_group.fp_sg.id]
   tags = {
     Name = "mongodb-server"
   }
@@ -454,33 +454,33 @@ resource "aws_s3_bucket" "s3_bucket_fp" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "block" {
-  bucket = aws_s3_bucket.s3_bucket_fp.id
+# resource "aws_s3_bucket_public_access_block" "block" {
+#   bucket = aws_s3_bucket.s3_bucket_fp.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+#   block_public_acls       = false
+#   block_public_policy     = false
+#   ignore_public_acls      = false
+#   restrict_public_buckets = false
 
-  depends_on = [aws_s3_bucket.s3_bucket_fp]
-}
+#   depends_on = [aws_s3_bucket.s3_bucket_fp]
+# }
 
-resource "aws_s3_bucket_policy" "public_read_policy" {
-  bucket = aws_s3_bucket.s3_bucket_fp.id
+# resource "aws_s3_bucket_policy" "public_read_policy" {
+#   bucket = aws_s3_bucket.s3_bucket_fp.id
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "PublicReadGetObject"
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.s3_bucket_fp.arn}/*"
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Sid       = "PublicReadGetObject"
+#         Effect    = "Allow"
+#         Principal = "*"
+#         Action    = "s3:GetObject"
+#         Resource  = "${aws_s3_bucket.s3_bucket_fp.arn}/*"
+#       }
+#     ]
+#   })
+# }
 
 
 
