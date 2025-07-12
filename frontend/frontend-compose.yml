@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: /home/ubuntu/frontend
+      dockerfile: Dockerfile
+      args:
+          VITE_BACKEND_ENDPOINT: http://private-lb-fp-0d6bf3c9c8822945.elb.us-east-1.amazonaws.com:5000
+          VITE_SERVER_HOSTNAME: ${HOSTNAME}
+    ports:
+      - 3000:3000
