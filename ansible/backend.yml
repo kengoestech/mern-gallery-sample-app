@@ -73,4 +73,4 @@
     - name: Run docker compose up
       command: docker compose -f backend-compose.yml up -d --build
       args:
-        chdir: /home/ubuntu/app/ansible 
+        chdir: /home/ubuntu/app/ansible/backend/ansible
