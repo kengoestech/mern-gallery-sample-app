@@ -5,13 +5,13 @@
   tasks:
     - name: Remove existing backend directory (if any)
       file:
-        path: /home/ubuntu/
+        path: /home/ubuntu/app
         state: absent
 
     - name: Clone backend repo
       git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
-        dest: /home/ubuntu/
+        dest: /home/ubuntu/app
         version: main
 
     - name: Install required system packages
@@ -66,11 +66,11 @@
     - name: Copy .env file
       copy:
         src: /home/kennedy_salud/mern-gallery-sample-app/backend/.env
-        dest: /home/ubuntu/backend/.env
+        dest: /home/ubuntu/app/backend/.env
         owner: ubuntu
         mode: '0644'
 
     - name: Run docker compose up
       command: docker compose -f backend-compose.yml up -d --build
       args:
-        chdir: /home/ubuntu/backend/
+        chdir: /home/ubuntu/app/backend/

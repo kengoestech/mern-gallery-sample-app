@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: /home/ubuntu/backend
+      context: /home/ubuntu/app/backend
       dockerfile: Dockerfile
     ports:
       - 5000:5000
