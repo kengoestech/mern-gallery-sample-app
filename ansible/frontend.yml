@@ -17,13 +17,17 @@
         state: present
         update_cache: true
 
-    - name: Build Docker Image
-      community.docker.docker_image:
-        name: frontend-app
-        tag: latest
-        source: build
-        build:
-          path: /home/ubuntu/app/frontend
+    - name: Build Frontend Docker Image
+    community.docker.docker_image:
+      name: frontend-app
+      tag: latest
+      source: build
+      build:
+        path: /home/ubuntu/app/frontend
+        buildargs:
+          VITE_BACKEND_ENDPOINT: "http://private-lb-fp-0b9ecc188b2812db.elb.us-east-1.amazonaws.com:5000"
+          VITE_SERVER_HOSTNAME: "your-hostname"
+
 
     - name: Run Container Image
       community.docker.docker_container:
