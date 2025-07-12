@@ -91,7 +91,7 @@ const upload = multer({
 });
 
 // Route to handle image uploads
-app.post('/upload', upload.single('image'), (req, res) => {
+app.post('/api/upload', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');
   }
