@@ -3,12 +3,12 @@
   become: true
 
   tasks:
-
-    - name: Clone from git repository
-      ansible.builtin.git:
-        repo: 'https://github.com/kengoestech/mern-gallery-sample-app.git'
-        version: main
-        dest: /home/ubuntu/app
+    - name: Copy backend source code
+      copy:
+        src: /home/kennedy_salud/mern-gallery-sample-app/backend/
+        dest: /home/ubuntu/app/ansible/backend/
+        owner: ubuntu
+        mode: '0755'
 
     - name: Install required system packages
       apt:
@@ -51,7 +51,21 @@
         state: started
         enabled: true
 
+    - name: Copy backend-compose.yml file
+      copy:
+        src: /home/kennedy_salud/mern-gallery-sample-app/ansible/backend-compose.yml
+        dest: /home/ubuntu/app/ansible/
+        owner: ubuntu
+        mode: '0644'
+
+    - name: Copy .env file
+      copy:
+        src: /home/kennedy_salud/mern-gallery-sample-app/backend/.env
+        dest: /home/ubuntu/app/ansible/.env
+        owner: ubuntu
+        mode: '0644'
+
     - name: Run docker compose up
       command: docker compose -f backend-compose.yml up -d --build
       args:
-        chdir: /home/ubuntu/app/ansible  # <- directory only!
+        chdir: /home/ubuntu/app/ansible 
