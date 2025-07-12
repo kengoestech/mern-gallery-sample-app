@@ -8,6 +8,7 @@
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
         dest: /home/ubuntu/app/ansible/backend
         version: main
+        force: yes
 
     - name: Install required system packages
       apt:
