@@ -3,12 +3,12 @@
   become: true
 
   tasks:
-    - name: Copy frontend source code
-      copy:
-        src: /home/kennedy_salud/mern-gallery-sample-app/frontend/
-        dest: /home/ubuntu/app/ansible/frontend/
-        owner: ubuntu
-        mode: '0755'
+    # - name: Copy frontend source code
+    #   copy:
+    #     src: /home/kennedy_salud/mern-gallery-sample-app/frontend/
+    #     dest: /home/ubuntu/app/ansible/frontend/
+    #     owner: ubuntu
+    #     mode: '0755'
 
     - name: Install required system packages
       apt:
@@ -27,6 +27,7 @@
         gpg --dearmor -o /etc/apt/keyrings/docker.gpg
       args:
         executable: /bin/bash
+        creates: /etc/apt/keyrings/docker.gpg
 
     - name: Add Docker repo
       copy:
