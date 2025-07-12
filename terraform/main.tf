@@ -109,9 +109,9 @@ resource "aws_subnet" "private_subnet_fp" {
   }
 }
 
-# Create security group for nginx proxy
-resource "aws_security_group" "nginx_proxy_sg" {
-  name        = "nginx-proxy-sg"
+# Create security group for project
+resource "aws_security_group" "fp_sg" {
+  name        = "fp-sg"
   description = "Allow HTTP traffic"
   vpc_id      = aws_vpc.vpc_fp.id
   ingress {
@@ -128,108 +128,150 @@ resource "aws_security_group" "nginx_proxy_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  egress {
-    description = "Allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Create security group for frontend - allow SSH from nginx only
-resource "aws_security_group" "frontend_sg" {
-  name        = "frontend-sg"
-  description = "Allow HTTP traffic"
-  vpc_id      = aws_vpc.vpc_fp.id
   ingress {
-    description     = "Allow SSH"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
-  }
-  ingress {
-    description = "Allow HTTP from anywhere"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    description = "Allow all traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Create security group for backend 
-resource "aws_security_group" "backend_sg" {
-  name        = "backend-sg"
-  description = "Allow app traffic to backend"
-  vpc_id      = aws_vpc.vpc_fp.id
-  ingress {
-    description     = "Allow SSH"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
-  }
-  ingress {
-    description = "Allow app traffic from frontend to backend on port 5000"
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"] # frontend subnet cidr_block
-  }
-  egress {
-    description = "default"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-    egress {
-    description = "Allow all outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Create security group for mongodb server
-resource "aws_security_group" "mongodb_sg" {
-  name        = "mongodb-sg"
-  description = "Allow app traffic to access the server"
-  vpc_id      = aws_vpc.vpc_fp.id
-
-  ingress {
-    description = "Allow app traffic to access the server on port 27017"
+    description = "Connect to database mongodb"
     from_port   = 27017
     to_port     = 27017
     protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
-
-  ingress {
-    description     = "Allow SSH"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.nginx_proxy_sg.id]
+    ingress {
+    description = "Connect frontend to backend"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-
   egress {
-    description = "Allow all outbound"
+    description = "Allow all traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# # Create security group for nginx proxy
+# resource "aws_security_group" "nginx_proxy_sg" {
+#   name        = "nginx-proxy-sg"
+#   description = "Allow HTTP traffic"
+#   vpc_id      = aws_vpc.vpc_fp.id
+#   ingress {
+#     description = "Allow SSH"
+#     from_port   = 22
+#     to_port     = 22
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#   ingress {
+#     description = "Allow HTTP from anywhere"
+#     from_port   = 80
+#     to_port     = 80
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#   egress {
+#     description = "Allow all traffic"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
+
+# # Create security group for frontend - allow SSH from nginx only
+# resource "aws_security_group" "frontend_sg" {
+#   name        = "frontend-sg"
+#   description = "Allow HTTP traffic"
+#   vpc_id      = aws_vpc.vpc_fp.id
+#   ingress {
+#     description     = "Allow SSH"
+#     from_port       = 22
+#     to_port         = 22
+#     protocol        = "tcp"
+#     security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
+#   }
+#   ingress {
+#     description = "Allow HTTP from anywhere"
+#     from_port   = 3000
+#     to_port     = 3000
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#   egress {
+#     description = "Allow all traffic"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
+
+# # Create security group for backend 
+# resource "aws_security_group" "backend_sg" {
+#   name        = "backend-sg"
+#   description = "Allow app traffic to backend"
+#   vpc_id      = aws_vpc.vpc_fp.id
+#   ingress {
+#     description     = "Allow SSH"
+#     from_port       = 22
+#     to_port         = 22
+#     protocol        = "tcp"
+#     security_groups = [aws_security_group.nginx_proxy_sg.id] #Allow SSH from nginx only
+#   }
+#   ingress {
+#     description = "Allow app traffic from frontend to backend on port 5000"
+#     from_port   = 5000
+#     to_port     = 5000
+#     protocol    = "tcp"
+#     cidr_blocks = ["10.0.1.0/24"] # frontend subnet cidr_block
+#   }
+#   egress {
+#     description = "default"
+#     from_port   = 443
+#     to_port     = 443
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#     egress {
+#     description = "Allow all outbound"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
+
+# # Create security group for mongodb server
+# resource "aws_security_group" "mongodb_sg" {
+#   name        = "mongodb-sg"
+#   description = "Allow app traffic to access the server"
+#   vpc_id      = aws_vpc.vpc_fp.id
+
+#   ingress {
+#     description = "Allow app traffic to access the server on port 27017"
+#     from_port   = 27017
+#     to_port     = 27017
+#     protocol    = "tcp"
+#     cidr_blocks = ["10.0.2.0/24"]
+#   }
+
+#   ingress {
+#     description     = "Allow SSH"
+#     from_port       = 22
+#     to_port         = 22
+#     protocol        = "tcp"
+#     security_groups = [aws_security_group.nginx_proxy_sg.id]
+#   }
+
+#   egress {
+#     description = "Allow all outbound"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 
 # # Create security group for jenkins 
