@@ -21,9 +21,8 @@
       community.docker.docker_image:
         name: frontend-app
         tag: latest
-        source: buildargs
         path: /home/ubuntu/app/frontend
-        buildargs:
+        args:
           VITE_BACKEND_ENDPOINT: "http://private-lb-fp-0b9ecc188b2812db.elb.us-east-1.amazonaws.com:5000"
           VITE_SERVER_HOSTNAME: "your-hostname"
 
