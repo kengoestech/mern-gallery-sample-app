@@ -3,12 +3,11 @@
   become: true
 
   tasks:
-    # - name: Copy backend source code
-    #   copy:
-    #     src: /home/kennedy_salud/mern-gallery-sample-app/backend/
-    #     dest: /home/ubuntu/app/ansible/backend/
-    #     owner: ubuntu
-    #     mode: '0755'
+    - name: Clone backend source code from GitHub
+      ansible.builtin.git:
+        repo: https://github.com/kengoestech/mern-gallery-sample-app.git
+        dest: /home/ubuntu/app/ansible/backend
+        version: main
 
     - name: Install required system packages
       apt:
