@@ -11,7 +11,7 @@
     - name: Clone backend repo
       git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
-        dest: /home/ubuntu
+        dest: /home/ubuntu/
         version: main
 
     - name: Install required system packages
