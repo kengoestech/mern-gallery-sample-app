@@ -5,13 +5,13 @@
   tasks:
     - name: Remove existing frontend directory (if any)
       file:
-        path: /home/ubuntu
+        path: /home/ubuntu/app
         state: absent
 
     - name: Clone backend repo
       git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
-        dest: /home/ubuntu/
+        dest: /home/ubuntu/app
         version: main
 
     - name: Install required system packages
@@ -66,4 +66,4 @@
     - name: Run docker compose up
       command: docker compose -f frontend-compose.yml up -d --build
       args:
-        chdir: /home/ubuntu/frontend
+        chdir: /home/ubuntu/app/frontend
