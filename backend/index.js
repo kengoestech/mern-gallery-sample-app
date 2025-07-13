@@ -9,13 +9,7 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://3.85.211.30/', // 
-  methods: ['*'],
-  allowedHeaders: ['Content-Type'],
-}));
-;
-
+app.use(cors());
 app.use(express.json());
 
 
