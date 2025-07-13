@@ -64,6 +64,6 @@
     #     mode: '0644'
 
     - name: Run docker compose up
-      command: docker compose -f frontend-compose.yml up -d --build
+      command: docker compose -f ../frontend-compose.yml up -d --build
       args:
         chdir: /home/ubuntu/app/frontend
