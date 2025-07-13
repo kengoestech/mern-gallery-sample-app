@@ -71,6 +71,6 @@
         mode: '0644'
 
     - name: Run docker compose up
-      command: docker compose -f ../backend-compose.yml up -d --build
+      command: docker compose -f ../ansible/backend-compose.yml up -d --build
       args:
         chdir: /home/ubuntu/app/backend/
