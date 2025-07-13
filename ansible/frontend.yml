@@ -56,13 +56,6 @@
         state: started
         enabled: true
 
-    # - name: Copy frontend-compose.yml file
-    #   copy:
-    #     src: /home/kennedy_salud/mern-gallery-sample-app/ansible/frontend-compose.yml
-    #     dest: /home/ubuntu/frontend
-    #     owner: ubuntu
-    #     mode: '0644'
-
     - name: Run docker compose up
       command: docker compose -f ../ansible/frontend-compose.yml up -d --build
       args:
