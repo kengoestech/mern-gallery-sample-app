@@ -1,0 +1,183 @@
+# Database
+- name: Setup MongoDB
+  hosts: mongodb
+  become: yes
+  tasks:
+    - name: Add MongoDB GPG key
+      ansible.builtin.apt_key:
+        url: https://www.mongodb.org/static/pgp/server-6.0.asc
+        state: present
+
+    - name: Add MongoDB 6.0 repository
+      ansible.builtin.apt_repository:
+        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse"
+        state: present
+        filename: "mongodb-org-6.0"
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install MongoDB
+      ansible.builtin.apt:
+        name: mongodb-org
+        state: present
+
+    - name: Enable and start MongoDB
+      ansible.builtin.systemd:
+        name: mongod
+        enabled: yes
+        state: started
+
+# Backend
+- name: Setup backend
+  hosts: backend
+  become: true
+
+  tasks:
+    - name: Remove existing backend directory (if any)
+      file:
+        path: /home/ubuntu/app
+        state: absent
+
+    - name: Clone backend repo
+      git:
+        repo: https://github.com/kengoestech/mern-gallery-sample-app.git
+        dest: /home/ubuntu/app
+        version: main
+
+    - name: Install required system packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: true
+
+    - name: Add Docker GPG key
+      shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+        gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+        executable: /bin/bash
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker repo
+      copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        content: |
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+
+    - name: Install Docker and Compose
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Copy .env file
+      copy:
+        src: /home/kennedy_salud/mern-gallery-sample-app/backend/.env
+        dest: /home/ubuntu/app/backend/.env
+        owner: ubuntu
+        mode: '0644'
+
+    # - name: Run docker compose up
+    #   command: docker compose -f backend-compose.yml up -d --build
+    #   args:
+    #     chdir: /home/ubuntu/app/backend/
+
+- name: Setup frontend
+  hosts: frontend
+  become: true
+
+  tasks:
+    - name: Remove existing frontend directory (if any)
+      file:
+        path: /home/ubuntu/app
+        state: absent
+
+    - name: Clone backend repo
+      git:
+        repo: https://github.com/kengoestech/mern-gallery-sample-app.git
+        dest: /home/ubuntu/app
+        version: main
+
+    - name: Install required system packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: true
+
+    - name: Add Docker GPG key
+      shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+        gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+        executable: /bin/bash
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker repo
+      copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        content: |
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+
+    - name: Install Docker and Compose
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    # - name: Copy frontend-compose.yml file
+    #   copy:
+    #     src: /home/kennedy_salud/mern-gallery-sample-app/ansible/frontend-compose.yml
+    #     dest: /home/ubuntu/frontend
+    #     owner: ubuntu
+    #     mode: '0644'
+
+    # - name: Run docker compose up
+    #   command: docker compose -f frontend-compose.yml up -d --build
+    #   args:
+    #     chdir: /home/ubuntu/app/frontend
+    
+# Run Docker compose
+- name: Setup MongoDB
+  hosts: mongodb
+  become: yes
+  tasks:
+
+- name: Run docker compose up
+  command: docker compose -f compose.yml up -d --build
+  args:
+    chdir: /home/ubuntu/app/
+

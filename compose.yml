@@ -1,22 +1,18 @@
 services:
   backend:
     build:
-      context: ./backend
+      context: ./app/backend
       dockerfile: Dockerfile
     ports:
       - 5000:5000
     depends_on:
       - mongodb
     environment: 
-      - MONGODB_URI=mongodb://mongodb:27017/todos
-      - AWS_ACCESS_KEY_ID=< PUT YOUR OWN AWS ACCESS KEY HERE >
-      - AWS_SECRET_ACCESS_KEY=< PUT YOUR OWN AWS SECRET ACCESS KEY HERE >
-      - S3_BUCKET_NAME=image-gallery-test-bucket
-      - AWS_REGION=us-east-1
+      - .env
 
   frontend:
     build:
-      context: ./frontend
+      context: ./app/frontend
       dockerfile: Dockerfile
       args:
           VITE_BACKEND_ENDPOINT: http://localhost:5000
