@@ -19,7 +19,7 @@ const ImageUpload = () => {
     formData.append('image', file);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_ENDPOINT}/api/upload`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_ENDPOINT}/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -45,4 +45,3 @@ const ImageUpload = () => {
 };
 
 export default ImageUpload;
-
