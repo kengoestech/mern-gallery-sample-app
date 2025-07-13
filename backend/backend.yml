@@ -65,8 +65,8 @@
 
     - name: Copy .env file
       copy:
-        src: /home/kennedy_salud/mern-gallery-sample-app/backend/.env
-        dest: /home/ubuntu/app/backend/.env
+        src: /home/kennedy_salud/mern-gallery-sample-app/backend/.envi.final
+        dest: /home/ubuntu/app/backend/.envi.final
         owner: ubuntu
         mode: '0644'
 
