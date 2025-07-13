@@ -4,7 +4,7 @@ services:
       context: /home/ubuntu/app/frontend
       dockerfile: Dockerfile
       args:
-          VITE_BACKEND_ENDPOINT: http:public-nlb-ca27e77cd883edb4.elb.us-east-1.amazonaws.com:5000
+          VITE_BACKEND_ENDPOINT: http://public-nlb-ca27e77cd883edb4.elb.us-east-1.amazonaws.com:5000
           VITE_SERVER_HOSTNAME: ${HOSTNAME}
     ports:
       - 3000:3000
