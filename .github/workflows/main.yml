@@ -19,11 +19,8 @@ jobs:
         run: ls -al  # Verify your directory structure
 
       - name: Change Directory to Terraform Folder
-        run: cd kengoestech/mern-gallery-sample-app/terraform  # Change to correct directory
-        continue-on-error: true  # Optional, allows workflow to continue even if this step fails
-
-      - name: Verify Directory Exists
-        run: ls -al kengoestech/mern-gallery-sample-app/terraform  # List contents of the specific directory to confirm
+        run: cd kengoestech/mern-gallery-sample-app/terraform 
+        continue-on-error: true  
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
