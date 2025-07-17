@@ -42,35 +42,4 @@ jobs:
           terraform plan   # Run Terraform plan
           terraform apply -auto-approve  # Apply the changes
 
-  ansible:
-    runs-on: ubuntu-latest
-    needs: terraform
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Ansible
-        uses: shivammathur/setup-ansible@v1
-        with:
-          ansible_version: '2.10'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pip3 install -r requirements.txt
-
-      - name: Run MongoDB Ansible Playbook
-        run: ansible-playbook -i inventory mongodb.yml
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: "false"
-
-      - name: Run Backend Ansible Playbook
-        run: ansible-playbook -i inventory backend.yml
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: "false"
-
-      - name: Run Frontend Ansible Playbook
-        run: ansible-playbook -i inventory frontend.yml
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: "false"
+  
