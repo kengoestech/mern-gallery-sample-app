@@ -3,10 +3,10 @@
   become: yes
   tasks:
 
-      - name: Remove existing mongodb directory (if any)
-        file:
-        path: /home/ubuntu/app
-        state: absent
+      # - name: Remove existing mongodb directory (if any)
+      #   file:
+      #   path: /home/ubuntu/app
+      #   state: absent
 
       - name: Clone mongodb repo
         git:
