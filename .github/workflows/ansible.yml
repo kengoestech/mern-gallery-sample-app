@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
-          pip3 install -r requirements.txt
+          pip3 install boto3 ansible
 
       - name: Run MongoDB Ansible Playbook
         run: |
