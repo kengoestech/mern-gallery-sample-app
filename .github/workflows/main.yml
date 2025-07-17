@@ -40,7 +40,7 @@ jobs:
           cd terraform  # Change to the correct directory
           terraform init  # Initialize Terraform
           terraform plan   # Run Terraform plan
-          terraform apply -auto-approve tfplan  # Apply the changes
+          terraform apply -auto-approve  # Apply the changes
 
   ansible:
     runs-on: ubuntu-latest
