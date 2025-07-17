@@ -1,4 +1,4 @@
-name: Terraform and Ansible Workflow
+name: Terraform Workflow
 
 on:
   push:
