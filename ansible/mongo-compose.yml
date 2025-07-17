@@ -1,8 +1,10 @@
  services: 
   mongodb:
-    image: mongo
+    image: mongo:latest
     container_name: mongodb
     volumes:
       - mongodbdata:/data/db
     ports:
       - 27017:27017
+    environment:
+      - .env
