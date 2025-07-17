@@ -48,6 +48,5 @@
         update_cache: true
 
     - name: Run docker compose up
-      command: docker compose -f ../ansible/backend-compose.yml up -d --build
-      args:
-        chdir: /home/ubuntu/app/backend/
+      command: docker compose -f ../ansible/mongodb-compose.yml up -d --build
+
