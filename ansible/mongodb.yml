@@ -3,12 +3,12 @@
   become: yes
   tasks:
 
-      - name: Remove existing backend directory (if any)
+      - name: Remove existing mongodb directory (if any)
         file:
         path: /home/ubuntu/app
         state: absent
 
-      - name: Clone backend repo
+      - name: Clone mongodb repo
         git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
         dest: /home/ubuntu/app
