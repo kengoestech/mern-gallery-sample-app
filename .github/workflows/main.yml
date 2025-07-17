@@ -20,6 +20,9 @@ jobs:
         with:
           terraform_version: '1.5.0'
 
+      - name: Change Directory to Terraform Folder
+        run: cd ~/terraform  # Change 'terraform' to your actual directory if it's different
+
       - name: Initialize Terraform
         run: terraform init
 
@@ -51,6 +54,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-pip
           pip3 install -r requirements.txt
+          
+      - name: Change Directory to Ansible Folder
+        run: cd ~/ansible  # Change 'terraform' to your actual directory if it's different
 
       - name: Run MongoDB Ansible Playbook
         run: ansible-playbook -i inventory mongodb.yml
