@@ -30,17 +30,12 @@ jobs:
           echo "Listing files in the mern-gallery-sample-app directory:"
           ls -al terraform
 
-      - name: Change to Terraform Directory
-        run: cd terraform  # Change to the directory where `main.tf` is located
-
-      - name: Initialize Terraform
-        run: terraform init  # Initialize Terraform
-
-      - name: Plan Terraform
-        run: terraform plan -out=tfplan  # Run terraform plan
-
-      - name: Apply Terraform
-        run: terraform apply -auto-approve tfplan  # Apply the changes
+      - name: Run Terraform Init, Plan, and Apply
+        run: |
+          cd terraform  
+          terraform init  # Initialize Terraform
+          terraform plan -out=tfplan  # Run Terraform plan
+          terraform apply -auto-approve tfplan  # Apply the Terraform changes
 
   ansible:
     runs-on: ubuntu-latest
