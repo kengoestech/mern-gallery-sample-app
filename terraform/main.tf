@@ -155,7 +155,7 @@ resource "aws_security_group" "fp_sg" {
   }
 }
 
-# Create ec2 load balancer nginx
+# Create ec2 nginx proxy
 resource "aws_instance" "nginx_proxy" {
   ami                         = "ami-020cba7c55df1f615"
   instance_type               = "t2.micro"
@@ -234,21 +234,21 @@ resource "aws_instance" "backend_instance_3" {
   }
 }
 
-# Create private NLB
-resource "aws_lb" "private_lb_fp" {
-  name               = "private-lb-fp"
-  internal           = true
+# Create NLB
+resource "aws_lb" "public_lb_fp" {
+  name               = "public-lb-fp"
+  internal           = false
   load_balancer_type = "network"
-  subnets            = [aws_subnet.private_subnet_fp.id]
+  subnets            = [aws_subnet.public_subnet_fp.id]
   tags = {
-    Name = "private-lb-fp"
+    Name = "public-lb-fp"
   }
 }
 
 # Port Forward to backend: forward requests to target group
-resource "aws_lb_listener" "private_nlb_listener" {
-  load_balancer_arn = aws_lb.private_lb_fp.arn
-  port              = 5000
+resource "aws_lb_listener" "public_nlb_listener" {
+  load_balancer_arn = aws_lb.public_lb_fp.arn
+  port              = 80
   protocol          = "TCP"
   default_action {
     type             = "forward"
@@ -262,6 +262,10 @@ resource "aws_lb_target_group" "nlb_targets" {
   port     = 5000
   protocol = "TCP"
   vpc_id   = aws_vpc.vpc_fp.id
+  health_check {
+    protocol = "TCP"
+    port     = "5000"
+  }
 }
 
 # Attach backend EC2 instance 1 to target group
