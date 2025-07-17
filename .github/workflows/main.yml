@@ -15,14 +15,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: List files in the repository
+        run: ls -al  # Verify your directory structure
+
+      - name: Change Directory to Terraform Folder
+        run: cd kengoestech/mern-gallery-sample-app/terraform  # Change to correct directory
+        continue-on-error: true  # Optional, allows workflow to continue even if this step fails
+
+      - name: Verify Directory Exists
+        run: ls -al kengoestech/mern-gallery-sample-app/terraform  # List contents of the specific directory to confirm
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: '1.5.0'
 
-      - name: Change Directory to Terraform Folder
-        run: cd kengoestech/mern-gallery-sample-app/terraform 
-        
       - name: Initialize Terraform
         run: terraform init
 
@@ -31,11 +38,6 @@ jobs:
 
       - name: Apply Terraform
         run: terraform apply -auto-approve tfplan
-
-      - name: Output Terraform Variables
-        id: terraform_output
-        run: |
-          echo "TF_OUTPUT=$(terraform output -json)" >> $GITHUB_ENV  # Store the output in GITHUB_ENV
 
   ansible:
     runs-on: ubuntu-latest
@@ -54,25 +56,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-pip
           pip3 install -r requirements.txt
-          
-      - name: Change Directory to Ansible Folder
-        run: cd cd kengoestech/mern-gallery-sample-app/ansible  
 
       - name: Run MongoDB Ansible Playbook
-        run: ansible-playbook -i inventory mongodb.yml
+        run: ansible-playbook -i inventory/hosts mongodb.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Backend Ansible Playbook
-        run: ansible-playbook -i inventory backend.yml
+        run: ansible-playbook -i inventory/hosts backend.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Frontend Ansible Playbook
-        run: ansible-playbook -i inventory frontend.yml
+        run: ansible-playbook -i inventory/hosts frontend.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
-
-      - name: Display Terraform Outputs
-        run: |
-          echo "Terraform output is: $TF_OUTPUT"
