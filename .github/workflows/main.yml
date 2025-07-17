@@ -1,0 +1,55 @@
+name: Terraform and Ansible Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: '1.1.5'
+
+      # Step 3: Terraform initialization
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 4: Terraform plan (optional, but useful for validation)
+      - name: Terraform Plan
+        run: terraform plan
+
+      # Step 5: Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      # Step 6: Set up Ansible
+      - name: Set up Ansible
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          ansible_version: '2.10.5'
+
+      # Step 7: Run MongoDB Ansible playbook
+      - name: Run MongoDB Playbook
+        run: ansible-playbook -i inventory mongodb.yml
+
+      # Step 8: Run Backend Ansible playbook
+      - name: Run Backend Playbook
+        run: ansible-playbook -i inventory backend.yml
+
+      # Step 9: Run Frontend Ansible playbook
+      - name: Run Frontend Playbook
+        run: ansible-playbook -i inventory frontend.yml
+
