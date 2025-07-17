@@ -310,33 +310,33 @@ resource "aws_s3_bucket" "s3_bucket_fp" {
   }
 }
 
-# resource "aws_s3_bucket_public_access_block" "block" {
-#   bucket = aws_s3_bucket.s3_bucket_fp.id
+resource "aws_s3_bucket_public_access_block" "block" {
+  bucket = aws_s3_bucket.s3_bucket_fp.id
 
-#   block_public_acls       = false
-#   block_public_policy     = false
-#   ignore_public_acls      = false
-#   restrict_public_buckets = false
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 
-#   depends_on = [aws_s3_bucket.s3_bucket_fp]
-# }
+  depends_on = [aws_s3_bucket.s3_bucket_fp]
+}
 
-# resource "aws_s3_bucket_policy" "public_read_policy" {
-#   bucket = aws_s3_bucket.s3_bucket_fp.id
+resource "aws_s3_bucket_policy" "public_read_policy" {
+  bucket = aws_s3_bucket.s3_bucket_fp.id
 
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Sid       = "PublicReadGetObject"
-#         Effect    = "Allow"
-#         Principal = "*"
-#         Action    = "s3:GetObject"
-#         Resource  = "${aws_s3_bucket.s3_bucket_fp.arn}/*"
-#       }
-#     ]
-#   })
-# }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.s3_bucket_fp.arn}/*"
+      }
+    ]
+  })
+}
 
 
 
