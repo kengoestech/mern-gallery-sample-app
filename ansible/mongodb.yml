@@ -48,5 +48,5 @@
         update_cache: true
 
     - name: Run docker compose up
-      command: docker compose -f ../ansible/mongo-compose.yml up -d --build
+      command: docker compose -f /home/ubuntu/app/ansible/mongo-compose.yml up -d --build
 
