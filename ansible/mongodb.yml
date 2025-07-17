@@ -10,9 +10,9 @@
 
       - name: Clone mongodb repo
         git:
-        repo: https://github.com/kengoestech/mern-gallery-sample-app.git
-        dest: /home/ubuntu/app
-        version: main
+          repo: https://github.com/kengoestech/mern-gallery-sample-app.git
+          dest: /home/ubuntu/app
+          version: main
 
       - name: Install required system packages
         apt:
