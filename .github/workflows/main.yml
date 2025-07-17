@@ -28,7 +28,7 @@ jobs:
       - name: List files in the mern-gallery-sample-app directory (Debugging Step)
         run: |
           echo "Listing files in the mern-gallery-sample-app directory:"
-          ls -al mern-gallery-sample-app 
+          ls -al terraform
 
       - name: List files in the mern-gallery-sample-app/terraform directory (Debugging Step)
         run: |
