@@ -47,6 +47,13 @@
         state: present
         update_cache: true
 
+    - name: Copy .env file
+      copy:
+        src: /home/kennedy_salud/mern-gallery-sample-app/ansible/.env
+        dest: /home/ubuntu/app/ansible/.env
+        owner: ubuntu
+        mode: '0644'
+
     - name: Run docker compose up
       command: docker compose -f /home/ubuntu/app/ansible/mongo-compose.yml up -d --build
 
