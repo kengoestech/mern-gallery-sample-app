@@ -15,19 +15,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: List files in the repository
-        run: ls -al  # Verify the repository's file structure
-
-      - name: List files in the terraform directory
-        run: ls -al kengoestech/mern-gallery-sample-app/terraform  # Ensure `main.tf` exists
-
       - name: Change to Terraform Directory
-        run: cd kengoestech/mern-gallery-sample-app/terraform  # Change directory to where `main.tf` is located
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: '1.5.0'
+        run: cd /mern-gallery-sample-app/terraform/  # Change directory to where `main.tf` is located
 
       - name: Initialize Terraform
         run: terraform init  # Initialize Terraform
@@ -45,28 +34,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Ansible
-        uses: shivammathur/setup-ansible@v1
-        with:
-          ansible_version: '2.10'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pip3 install -r requirements.txt
-
       - name: Run MongoDB Ansible Playbook
-        run: ansible-playbook -i inventory/hosts mongodb.yml
+        run: ansible-playbook -i inventory mongodb.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
 
+      - name: Change to Terraform Directory
+        run: cd /mern-gallery-sample-app/ansible/
+
       - name: Run Backend Ansible Playbook
-        run: ansible-playbook -i inventory/hosts backend.yml
+        run: ansible-playbook -i inventory backend.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Frontend Ansible Playbook
-        run: ansible-playbook -i inventory/hosts frontend.yml
+        run: ansible-playbook -i inventory frontend.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
