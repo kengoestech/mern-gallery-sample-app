@@ -18,20 +18,25 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: '1.5.0'  # Specify the Terraform version you want to use
+          terraform_version: '1.5.0'
 
       - name: Initialize Terraform
         run: terraform init
 
       - name: Plan Terraform
-        run: terraform plan
+        run: terraform plan -out=tfplan
 
       - name: Apply Terraform
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
+
+      - name: Output Terraform Variables
+        id: terraform_output
+        run: |
+          echo "TF_OUTPUT=$(terraform output -json)" >> $GITHUB_ENV  # Store the output in GITHUB_ENV
 
   ansible:
     runs-on: ubuntu-latest
-    needs: terraform  # Ensures Ansible runs after Terraform
+    needs: terraform
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -39,25 +44,29 @@ jobs:
       - name: Set up Ansible
         uses: shivammathur/setup-ansible@v1
         with:
-          ansible_version: '2.10'  # Specify the Ansible version you want to use
+          ansible_version: '2.10'
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
-          pip3 install -r requirements.txt  # If you have a requirements.txt
+          pip3 install -r requirements.txt
 
       - name: Run MongoDB Ansible Playbook
         run: ansible-playbook -i inventory mongodb.yml
         env:
-          ANSIBLE_HOST_KEY_CHECKING: "false"  # Disable host key checking if required
+          ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Backend Ansible Playbook
         run: ansible-playbook -i inventory backend.yml
         env:
-          ANSIBLE_HOST_KEY_CHECKING: "false"  # Disable host key checking if required
+          ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Frontend Ansible Playbook
         run: ansible-playbook -i inventory frontend.yml
         env:
-          ANSIBLE_HOST_KEY_CHECKING: "false"  # Disable host key checking if required
+          ANSIBLE_HOST_KEY_CHECKING: "false"
+
+      - name: Display Terraform Outputs
+        run: |
+          echo "Terraform output is: $TF_OUTPUT"
