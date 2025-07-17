@@ -3,6 +3,11 @@
   become: yes
   tasks:
 
+    - name: Remove existing backend directory (if any)
+      file:
+        path: /home/ubuntu/app
+        state: absent
+
     - name: Clone mongodb repo
       git:
         repo: https://github.com/kengoestech/mern-gallery-sample-app.git
@@ -41,3 +46,8 @@
           - docker-compose-plugin
         state: present
         update_cache: true
+
+    - name: Run docker compose up
+      command: docker compose -f ../ansible/backend-compose.yml up -d --build
+      args:
+        chdir: /home/ubuntu/app/backend/
