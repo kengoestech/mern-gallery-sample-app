@@ -39,7 +39,7 @@ jobs:
         run: |
           cd terraform  # Change to the correct directory
           terraform init  # Initialize Terraform
-          terraform plan -out=tfplan  # Run Terraform plan
+          terraform plan   # Run Terraform plan
           terraform apply -auto-approve tfplan  # Apply the changes
 
   ansible:
