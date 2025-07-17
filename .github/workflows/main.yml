@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Change to Terraform Directory
-        run: cd terraform/main.tf  # Change directory to where `main.tf` is located
+        run: cd mern-gallery-sample-app/terraform
 
       - name: Initialize Terraform
         run: terraform init  # Initialize Terraform
