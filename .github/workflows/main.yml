@@ -38,7 +38,7 @@ jobs:
 
       - name: Run Terraform Init, Plan, and Apply
         run: |
-          cd mern-gallery-sample-app/terraform  # Change to the correct directory
+          cd terraform  # Change to the correct directory
           terraform init  # Initialize Terraform
           terraform plan -out=tfplan  # Run Terraform plan
           terraform apply -auto-approve tfplan  # Apply the changes
