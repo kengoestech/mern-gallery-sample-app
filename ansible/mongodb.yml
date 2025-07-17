@@ -2,6 +2,18 @@
   hosts: mongodb
   become: yes
   tasks:
+
+      - name: Remove existing backend directory (if any)
+        file:
+        path: /home/ubuntu/app
+        state: absent
+
+      - name: Clone backend repo
+        git:
+        repo: https://github.com/kengoestech/mern-gallery-sample-app.git
+        dest: /home/ubuntu/app
+        version: main
+
       - name: Install required system packages
         apt:
         name:
@@ -69,13 +81,6 @@
         name: mongod
         enabled: yes
         state: started
-
-      - name: Copy backend-compose.yml file
-        copy:
-          src: /home/kennedy_salud/mern-gallery-sample-app/ansible/mongo-compose.yml
-          dest: /home/ubuntu/app
-          owner: ubuntu
-          mode: '0644'
 
       - name: Run docker compose up
         command: docker compose -f ../ansible/mongo-compose.yml up -d --build
