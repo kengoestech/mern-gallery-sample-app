@@ -21,8 +21,7 @@ jobs:
           terraform_version: '1.5.0'
 
       - name: Change Directory to Terraform Folder
-        run: cd ~/terraform  # Change 'terraform' to your actual directory if it's different
-
+        run: cd mern-gallery-sample-app/terraform 
       - name: Initialize Terraform
         run: terraform init
 
@@ -56,7 +55,7 @@ jobs:
           pip3 install -r requirements.txt
           
       - name: Change Directory to Ansible Folder
-        run: cd ~/ansible  # Change 'terraform' to your actual directory if it's different
+        run: cd cd mern-gallery-sample-app/ansible  
 
       - name: Run MongoDB Ansible Playbook
         run: ansible-playbook -i inventory mongodb.yml
