@@ -1,3 +1,5 @@
 I used terraform for the insfra, ansible for configuration, and GH Actions for CI/CD Pipeline
 
 For the CI/CD- workflow, there are 2 files including ansible.yml and main.yml (terraform)
+
+I commented out the GH action for terraform (main.yml) since it creates multiple instances 
