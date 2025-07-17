@@ -41,15 +41,17 @@ jobs:
         with:
           ansible_version: '2.10.5'
 
-      # Step 7: Run MongoDB Ansible playbook
+      # Step 7: Run MongoDB Ansible Playbook
       - name: Run MongoDB Playbook
-        run: ansible-playbook -i inventory mongodb.yml
+        run: |
+          ansible-playbook -i inventory mongodb.yml
 
-      # Step 8: Run Backend Ansible playbook
+      # Step 9: Run Backend Ansible Playbook
       - name: Run Backend Playbook
-        run: ansible-playbook -i inventory backend.yml
+        run: |
+          ansible-playbook -i inventory backend.yml
 
-      # Step 9: Run Frontend Ansible playbook
+      # Step 10: Run Frontend Ansible Playbook
       - name: Run Frontend Playbook
-        run: ansible-playbook -i inventory frontend.yml
-
+        run: |
+          ansible-playbook -i inventory frontend.yml
