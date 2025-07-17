@@ -28,16 +28,22 @@ jobs:
           pip3 install -r requirements.txt
 
       - name: Run MongoDB Ansible Playbook
-        run: ansible-playbook -i inventory mongodb.yml
+        run: |
+          cd ansible
+          ansible-playbook -i inventory mongodb.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Backend Ansible Playbook
-        run: ansible-playbook -i inventory backend.yml
+        run: |
+          cd ansible
+          ansible-playbook -i inventory backend.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
 
       - name: Run Frontend Ansible Playbook
-        run: ansible-playbook -i inventory frontend.yml
+        run: |
+          cd ansible
+          ansible-playbook -i inventory frontend.yml
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
