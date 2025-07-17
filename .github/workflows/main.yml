@@ -30,12 +30,18 @@ jobs:
           echo "Listing files in the mern-gallery-sample-app directory:"
           ls -al terraform
 
+      - name: Configure AWS Credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" >> $GITHUB_ENV  # If using temporary credentials
+
       - name: Run Terraform Init, Plan, and Apply
         run: |
-          cd terraform  
+          cd mern-gallery-sample-app/terraform  # Change to the correct directory
           terraform init  # Initialize Terraform
           terraform plan -out=tfplan  # Run Terraform plan
-          terraform apply -auto-approve tfplan  # Apply the Terraform changes
+          terraform apply -auto-approve tfplan  # Apply the changes
 
   ansible:
     runs-on: ubuntu-latest
